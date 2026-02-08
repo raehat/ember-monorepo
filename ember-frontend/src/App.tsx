@@ -1897,7 +1897,6 @@ const handleWalletConnect = async (walletName: string) => {
             {/* CTA */}
             <div className="text-center">
               <button 
-                onClick={handleLendTokens}
                 className="group relative px-12 py-6 bg-gradient-to-r from-green-500 to-blue-500 rounded-2xl text-xl font-semibold hover:from-green-600 hover:to-blue-600 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-green-500/25"
               >
                 <span className="flex items-center">
