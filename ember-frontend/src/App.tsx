@@ -718,13 +718,13 @@ const handleWalletConnect = async (walletName: string) => {
               <div className="text-center">
                 <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-12 max-w-md mx-auto">
                   <Wallet className="w-16 h-16 text-orange-400 mx-auto mb-6" />
-                  <h2 className="text-2xl font-semibold mb-4">Connect MetaMask</h2>
-                  <p className="text-gray-400 mb-6">Connect your MetaMask wallet to view your active loans</p>
+                  <h2 className="text-2xl font-semibold mb-4">Connect Slush</h2>
+                  <p className="text-gray-400 mb-6">Connect your Slush wallet to view your active loans</p>
                   <button
                     onClick={() => setShowMetaMaskModal(true)}
                     className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-200 transform hover:scale-105"
                   >
-                    Connect MetaMask
+                    Connect Slush Wallet
                   </button>
                 </div>
               </div>
