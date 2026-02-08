@@ -1667,8 +1667,8 @@ const handleWalletConnect = async (walletName: string) => {
                 <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Wallet className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold mb-2">Connect MetaMask</h2>
-                <p className="text-gray-400">Connect your MetaMask wallet to start lending</p>
+                <h2 className="text-2xl font-bold mb-2">Connect Slush</h2>
+                <p className="text-gray-400">Connect your Slush wallet to start lending</p>
               </div>
               
               <button
