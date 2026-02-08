@@ -31,44 +31,52 @@ import {
 import { DropdownPortal } from './DropdownPortal';
 
 // Persistent Prototype Banner
-// function PrototypeBanner() {
-//   return (
-//     <div className="w-full bg-yellow-500 text-black text-center py-2 px-4 font-semibold text-sm shadow-lg z-[100] fixed top-0 left-0">
-//       ⚠️ Notice: No active ember nodes are running, atleast 1 ember node must run to communicate with ember network.
-//     </div>
-//   );
-// }
+function PrototypeBanner() {
+  return (
+    <div className="w-full bg-yellow-500 text-black text-center py-2 px-4 font-semibold text-sm shadow-lg z-[100] fixed top-0 left-0">
+      Go through ember protocol architecture:{" "}
+      <a
+        href="https://ember-7.gitbook.io/ember-protocol-1/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline font-bold hover:text-gray-800"
+      >
+        ember-7.gitbook.io/ember-protocol-1
+      </a>
+    </div>
+  );
+}
 
 // // Prototype Notice Modal
-// function PrototypeNoticeModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-//   if (!open) return null;
-//   return (
-//     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-//       <div className="bg-yellow-100 text-black rounded-2xl shadow-xl p-8 max-w-md w-full relative border-2 border-yellow-400">
-//         <button
-//           onClick={onClose}
-//           className="absolute top-4 right-4 text-yellow-700 hover:text-black text-xl font-bold"
-//           aria-label="Close"
-//         >
-//           ×
-//         </button>
-//         <div className="flex flex-col items-center">
-//           <div className="text-4xl mb-4">⚠️</div>
-//           <h2 className="text-xl font-bold mb-2 text-center">Notice</h2>
-//           <p className="text-center text-base mb-4">
-//              No active ember nodes are running, atleast 1 ember node must run to communicate with ember network.<br/>
-//           </p>
-//           <button
-//             onClick={onClose}
-//             className="mt-2 px-6 py-2 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-500 transition"
-//           >
-//             Got it
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
+function PrototypeNoticeModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+      <div className="bg-yellow-100 text-black rounded-2xl shadow-xl p-8 max-w-md w-full relative border-2 border-yellow-400">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-yellow-700 hover:text-black text-xl font-bold"
+          aria-label="Close"
+        >
+          ×
+        </button>
+        <div className="flex flex-col items-center">
+          <div className="text-4xl mb-4">⚠️</div>
+          <h2 className="text-xl font-bold mb-2 text-center">Notice</h2>
+          <p className="text-center text-base mb-4">
+             No active lender nodes are running, atleast 1 ember node must run to communicate with ember network.<br/>
+          </p>
+          <button
+            onClick={onClose}
+            className="mt-2 px-6 py-2 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-500 transition"
+          >
+            Got it
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   const [isVisible, setIsVisible] = useState(false);
@@ -95,6 +103,8 @@ function App() {
   const lendTokenDropdownRef = useRef(null);
   const [showPrototypeNotice, setShowPrototypeNotice] = useState(false);
     const [showModal, setShowModal] = useState(false);
+    const [open, setOpen] = useState(false);
+
 
 
   useEffect(() => {
@@ -205,7 +215,7 @@ function LoanModal({ onClose }: LoanModalProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
-    }, 2000);
+    }, 2000000);
 
     return () => clearTimeout(timer);
   }, [onClose]);
@@ -217,7 +227,7 @@ function LoanModal({ onClose }: LoanModalProps) {
           Waiting for loan confirmation
         </h2>
         <p className="text-gray-600 text-sm">
-          Loan being fulfilled, this should take less than 10 seconds…
+          Loan being fulfilled, this should take less than 10 seconds, if takes longer, it means no lender nodes are active
         </p>
       </div>
     </div>
@@ -275,7 +285,7 @@ const handleWalletConnect = async (walletName: string) => {
     console.log("Loan Modal Triggered");
     setShowModal(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000000));
 
     setShowModal(false);
 
@@ -287,6 +297,11 @@ const handleWalletConnect = async (walletName: string) => {
 
     try {
       // Switch to Testnet4
+      <PrototypeNoticeModal
+        open={open}
+        onClose={() => setOpen(false)}
+      />
+
       await unisat.switchNetwork("testnet");
 
       // Send 0.0001 BTC (10,000 sats) to a testnet address
@@ -477,6 +492,10 @@ const handleWalletConnect = async (walletName: string) => {
     return (
       <div className="min-h-screen bg-gray-900 text-white">
         {/* <PrototypeBanner /> */}
+        <PrototypeNoticeModal
+        open={open}
+        onClose={() => setOpen(false)}
+      />
         {/* Background Effects */}
         <div className="fixed inset-0 bg-gradient-to-br from-green-500/10 via-blue-500/5 to-purple-500/10"></div>
         <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-green-400/20 via-transparent to-transparent"></div>
@@ -1596,7 +1615,8 @@ const handleWalletConnect = async (walletName: string) => {
   // Main Homepage
   return (
     <>
-      <div className="min-h-screen bg-gray-900 text-white overflow-hidden">
+    <PrototypeBanner />
+      <div className="min-h-screen bg-gray-900 text-white overflow-hidden pt-10">
         {/* Background Effects */}
         <div className="fixed inset-0 bg-gradient-to-br from-orange-500/10 via-red-500/5 to-yellow-500/10"></div>
         <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-400/20 via-transparent to-transparent"></div>
