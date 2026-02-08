@@ -31,44 +31,44 @@ import {
 import { DropdownPortal } from './DropdownPortal';
 
 // Persistent Prototype Banner
-function PrototypeBanner() {
-  return (
-    <div className="w-full bg-yellow-500 text-black text-center py-2 px-4 font-semibold text-sm shadow-lg z-[100] fixed top-0 left-0">
-      ⚠️ Notice: No active ember nodes are running, atleast 1 ember node must run to communicate with ember network.
-    </div>
-  );
-}
+// function PrototypeBanner() {
+//   return (
+//     <div className="w-full bg-yellow-500 text-black text-center py-2 px-4 font-semibold text-sm shadow-lg z-[100] fixed top-0 left-0">
+//       ⚠️ Notice: No active ember nodes are running, atleast 1 ember node must run to communicate with ember network.
+//     </div>
+//   );
+// }
 
-// Prototype Notice Modal
-function PrototypeNoticeModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-      <div className="bg-yellow-100 text-black rounded-2xl shadow-xl p-8 max-w-md w-full relative border-2 border-yellow-400">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-yellow-700 hover:text-black text-xl font-bold"
-          aria-label="Close"
-        >
-          ×
-        </button>
-        <div className="flex flex-col items-center">
-          <div className="text-4xl mb-4">⚠️</div>
-          <h2 className="text-xl font-bold mb-2 text-center">Notice</h2>
-          <p className="text-center text-base mb-4">
-             No active ember nodes are running, atleast 1 ember node must run to communicate with ember network.<br/>
-          </p>
-          <button
-            onClick={onClose}
-            className="mt-2 px-6 py-2 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-500 transition"
-          >
-            Got it
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+// // Prototype Notice Modal
+// function PrototypeNoticeModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+//   if (!open) return null;
+//   return (
+//     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+//       <div className="bg-yellow-100 text-black rounded-2xl shadow-xl p-8 max-w-md w-full relative border-2 border-yellow-400">
+//         <button
+//           onClick={onClose}
+//           className="absolute top-4 right-4 text-yellow-700 hover:text-black text-xl font-bold"
+//           aria-label="Close"
+//         >
+//           ×
+//         </button>
+//         <div className="flex flex-col items-center">
+//           <div className="text-4xl mb-4">⚠️</div>
+//           <h2 className="text-xl font-bold mb-2 text-center">Notice</h2>
+//           <p className="text-center text-base mb-4">
+//              No active ember nodes are running, atleast 1 ember node must run to communicate with ember network.<br/>
+//           </p>
+//           <button
+//             onClick={onClose}
+//             className="mt-2 px-6 py-2 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-500 transition"
+//           >
+//             Got it
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
 
 function App() {
   const [isVisible, setIsVisible] = useState(false);
@@ -78,7 +78,7 @@ function App() {
   const [connectedMetaMask, setConnectedMetaMask] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<'home' | 'loan' | 'lend' | 'transaction' | 'manage-loans' | 'repay-loan'>('home');
   const [selectedToken, setSelectedToken] = useState('USDC');
-  const [selectedChain, setSelectedChain] = useState('Ethereum');
+  const [selectedChain, setSelectedChain] = useState('Sui');
   const [recipientAddress, setRecipientAddress] = useState('');
   const [loanAmount, setLoanAmount] = useState('');
   const [lendAmount, setLendAmount] = useState('');
@@ -94,6 +94,8 @@ function App() {
   const chainDropdownRef = useRef(null);
   const lendTokenDropdownRef = useRef(null);
   const [showPrototypeNotice, setShowPrototypeNotice] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+
 
   useEffect(() => {
     setIsVisible(true);
@@ -140,11 +142,7 @@ function App() {
   ];
 
   const chains = [
-    { name: 'Ethereum', icon: '⟠', fee: '$12' },
-    { name: 'Polygon', icon: '🟣', fee: '$0.50' },
-    { name: 'Arbitrum', icon: '🔵', fee: '$2' },
-    { name: 'Optimism', icon: '🔴', fee: '$3' },
-    { name: 'Base', icon: '🔷', fee: '$1' }
+    { name: 'Sui', icon: '🔗', fee: '$1' }
   ];
 
   // Mock active loans data
@@ -159,7 +157,7 @@ function App() {
       monthlyPayment: '108.33',
       dueDate: '2024-12-15',
       status: 'active',
-      chain: 'Ethereum'
+      chain: 'Sui'
     },
     {
       id: 'loan-002',
@@ -178,12 +176,66 @@ function App() {
   // Helper to show the modal after actions
   const showNotice = () => setShowPrototypeNotice(true);
 
-  const handleWalletConnect = (walletName: string) => {
-    setConnectedWallet(walletName);
-    setShowWalletModal(false);
-    showNotice();
-    console.log(`Connecting to ${walletName} wallet...`);
-  };
+   const connectWallet = async (): Promise<string | null> => {
+  try {
+    const unisat = (window as any).unisat;
+    if (!unisat) {
+      alert("Please install UniSat Wallet");
+      return null; // Exit early
+    }
+
+    const accounts = await unisat.requestAccounts();
+    const address = accounts[0];
+
+    const balance = await unisat.getBalance();
+    console.log("Address:", address, "Balance:", balance.total);
+
+    return address; // Return address if connected
+  } catch (err) {
+    console.error("Connection failed:", err);
+    return null;
+  }
+};
+
+interface LoanModalProps {
+  onClose: () => void;
+}
+
+function LoanModal({ onClose }: LoanModalProps) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-6 rounded shadow-md text-center">
+        <h2 className="text-lg font-semibold mb-2">
+          Waiting for loan confirmation
+        </h2>
+        <p className="text-gray-600 text-sm">
+          Loan being fulfilled, this should take less than 10 seconds…
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// Handle wallet connect
+const handleWalletConnect = async (walletName: string) => {
+  const address = await connectWallet();
+  if (!address) return; // Stop here if wallet not installed or failed
+
+  // Only runs if UniSat exists and connected
+  setConnectedWallet(walletName);
+  setShowWalletModal(false);
+  showNotice();
+  console.log(`Connected to ${walletName} wallet at ${address}`);
+};
+
 
   const handleMetaMaskConnect = () => {
     setConnectedMetaMask('0x742d35Cc6634C0532925a3b8D');
@@ -218,6 +270,39 @@ function App() {
       showNotice();
     }
   };
+
+  const loanModalDemo = async () => {
+    console.log("Loan Modal Triggered");
+    setShowModal(true);
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    setShowModal(false);
+
+    const unisat = (window as any).unisat;
+    if (!unisat) {
+      alert("Please install UniSat Wallet to continue");
+      return;
+    }
+
+    try {
+      // Switch to Testnet4
+      await unisat.switchNetwork("testnet");
+
+      // Send 0.0001 BTC (10,000 sats) to a testnet address
+      const txid = await unisat.sendBitcoin(
+        "tb1q2velem5gvs3r2ptyeausrvalxq495esx7nwgf9", // Example testnet address
+        1000 // amount in sats
+      );
+
+      alert(`Transaction sent! TXID: ${txid}`);
+      console.log("Transaction ID:", txid);
+      handleExecuteLoan();
+    } catch (err) {
+      console.error("Bitcoin request failed:", err);
+      alert("Transaction failed: " + err);
+    }
+}
 
   const handleExecuteLoan = () => {
     const txHash = '0x' + Math.random().toString(16).substr(2, 64);
@@ -320,7 +405,7 @@ function App() {
     {
       icon: <Bitcoin className="w-8 h-8" />,
       title: "Native Bitcoin Collateral",
-      description: "Use your Bitcoin directly as collateral without bridging, wrapping, or custody risks"
+      description: "Use your Bitcoin directly as collateral without bridging on Sui, wrapping, or custody risks"
     },
     {
       icon: <MousePointer className="w-8 h-8" />,
@@ -370,7 +455,7 @@ function App() {
     },
     {
       icon: <Zap className="w-6 h-6" />,
-      title: "EP Token Liquidity",
+      title: "Loans Transferable",
       description: "Trade your position anytime"
     },
     {
@@ -378,20 +463,20 @@ function App() {
       title: "Bitcoin Secured",
       description: "Backed by native Bitcoin collateral"
     }
-  ];
+  ];45
 
   const stats = [
-    { label: "Bitcoin Collateral Locked", value: "$847M+" },
-    { label: "Loans Issued", value: "12.4K+" },
-    { label: "Average Loan Size", value: "$45K" },
-    { label: "Loan Success Rate", value: "99.8%" }
+    { label: "Bitcoin Collateral Locked", value: "$30" },
+    { label: "Loans Issued", value: "3" },
+    { label: "Average Loan Size", value: "$12.5" },
+    { label: "Loan Success Rate", value: "99.9%" }
   ];
 
   // Transaction Completion Page
   if (currentPage === 'transaction') {
     return (
       <div className="min-h-screen bg-gray-900 text-white">
-        <PrototypeBanner />
+        {/* <PrototypeBanner /> */}
         {/* Background Effects */}
         <div className="fixed inset-0 bg-gradient-to-br from-green-500/10 via-blue-500/5 to-purple-500/10"></div>
         <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-green-400/20 via-transparent to-transparent"></div>
@@ -572,7 +657,7 @@ function App() {
 
   // Manage Loans Page
   if (currentPage === 'manage-loans') {
-    <PrototypeBanner />
+    // <PrototypeBanner />
     return (
       <div className="min-h-screen bg-gray-900 text-white">
         {/* Background Effects */}
@@ -718,7 +803,7 @@ function App() {
 
   // Repay Loan Page
   if (currentPage === 'repay-loan') {
-    <PrototypeBanner />
+    // <PrototypeBanner />
     return (
       <div className="min-h-screen bg-gray-900 text-white">
         {/* Background Effects */}
@@ -874,7 +959,7 @@ function App() {
 
   // Lending Page
   if (currentPage === 'lend') {
-    <PrototypeBanner />
+    // <PrototypeBanner />
     return (
       <div className="min-h-screen bg-gray-900 text-white">
         {/* Background Effects */}
@@ -1483,17 +1568,19 @@ function App() {
 
                   <button 
                     disabled={!loanAmount || !recipientAddress}
-                    onClick={handleExecuteLoan}
+                    onClick={loanModalDemo}
                     className="w-full py-4 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
                     Execute Loan
                   </button>
+
+                        {showModal && <LoanModal onClose={() => setShowModal(false)} />}
                   
                   <div className="mt-4 p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg">
                     <div className="flex items-start">
                       <Shield className="w-4 h-4 text-orange-400 mr-2 mt-0.5 flex-shrink-0" />
                       <div className="text-xs text-orange-200">
-                        Your Bitcoin remains in your wallet as collateral. Loan will be automatically liquidated if BTC price drops significantly.
+                        Your Bitcoin remains in your custody.
                       </div>
                     </div>
                   </div>
@@ -1509,9 +1596,7 @@ function App() {
   // Main Homepage
   return (
     <>
-      <PrototypeBanner />
-      <PrototypeNoticeModal open={showPrototypeNotice} onClose={() => setShowPrototypeNotice(false)} />
-      <div className="min-h-screen bg-gray-900 text-white overflow-hidden pt-10">
+      <div className="min-h-screen bg-gray-900 text-white overflow-hidden">
         {/* Background Effects */}
         <div className="fixed inset-0 bg-gradient-to-br from-orange-500/10 via-red-500/5 to-yellow-500/10"></div>
         <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-400/20 via-transparent to-transparent"></div>
@@ -1750,7 +1835,7 @@ function App() {
               </div>
               <h2 className="text-4xl md:text-5xl font-bold mb-6">
                 <span className="bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
-                  Earn 4% APY Risk-Free
+                  Earn 6-7% APY Risk-Free
                 </span>
               </h2>
               <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
@@ -1804,18 +1889,6 @@ function App() {
                       <td className="py-4 px-4 text-center text-red-400">✗ No Collateral</td>
                       <td className="py-4 px-4 text-center text-yellow-400">~ Mixed Assets</td>
                     </tr>
-                    <tr className="border-b border-gray-800">
-                      <td className="py-4 px-4 font-medium">Liquidity Access</td>
-                      <td className="py-4 px-4 text-center text-green-400">✓ EP Tokens</td>
-                      <td className="py-4 px-4 text-center text-green-400">✓ LP Tokens</td>
-                      <td className="py-4 px-4 text-center text-red-400">✗ Locked</td>
-                    </tr>
-                    <tr>
-                      <td className="py-4 px-4 font-medium">Complexity</td>
-                      <td className="py-4 px-4 text-center text-green-400">✓ One Click</td>
-                      <td className="py-4 px-4 text-center text-red-400">✗ Complex</td>
-                      <td className="py-4 px-4 text-center text-yellow-400">~ Moderate</td>
-                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -1829,13 +1902,13 @@ function App() {
               >
                 <span className="flex items-center">
                   <DollarSign className="w-6 h-6 mr-3" />
-                  {connectedMetaMask ? 'Start Earning Risk-Free Returns' : 'Connect MetaMask to Lend'}
+                  {connectedMetaMask ? 'Start Earning Risk-Free Returns' : 'Become a lender'}
                   <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" />
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-400 rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity"></div>
               </button>
               <p className="text-sm text-gray-400 mt-3">
-                {connectedMetaMask ? 'Earn guaranteed returns • Get tradeable EP tokens • 100% Bitcoin secured' : 'Connect MetaMask to start earning risk-free returns'}
+                {connectedMetaMask ? 'Earn guaranteed returns • Get tradeable EP tokens • 100% Bitcoin secured' : 'Download lending node setup and start today!'}
               </p>
             </div>
           </div>
@@ -1976,7 +2049,7 @@ function App() {
                 </span>
               </div>
               <div className="text-gray-400 text-sm">
-                © 2024 Ember Protocol. Native Bitcoin collateralized lending.
+                © 2026 Ember Protocol. Native Bitcoin collateralized lending.
               </div>
             </div>
           </div>
